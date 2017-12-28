@@ -1,17 +1,21 @@
-local uci = require("simple-uci").cursor()
-local lutil = require 'gluon.web.util'
-local util = require 'gluon.util'
+local uci = luci.model.uci.cursor()
+
+local meshvpn_enabled = uci:get('tunneldigger', uci:get_first('tunneldigger', 'broker'), 'enabled')
+
+local i18n = require 'luci.i18n'
+local util = require 'luci.util'
 local site = require 'gluon.site_config'
 local sysconfig = require 'gluon.sysconfig'
-local pretty_hostname = require 'pretty_hostname'
 
 local macaddr = uci:get_first('tunneldigger', 'broker', 'uuid')
-local hostname = pretty_hostname.get(uci)
-local msg = _translate('gluon-config-mode:macaddr')
+local hostname = uci:get_first("system", "system", "hostname")
+local msg = i18n.translate('gluon-config-mode:macaddr')
 
-renderer.render_string(msg, {
-   macaddr = macaddr,
-   hostname = hostname,
-   site = site,
-   sysconfig = sysconfig
-})
+return function()
+    luci.template.render_string(msg, {
+        macaddr = macaddr,
+        hostname = hostname,
+        site = site,
+        sysconfig = sysconfig
+    })
+end
